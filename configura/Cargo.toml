@@ -28,7 +28,6 @@ serde_yml = { version = "^0.0.12", optional = true }
 toml = { version = "^0.8", optional = true }
 
 [dev-dependencies]
-configura = { version = "^1", features = ["full"], path = "." }
 tempfile = "^3"
 temp-env = "^0.3"
 criterion = "^0.5"
