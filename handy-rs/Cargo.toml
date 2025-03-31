@@ -1,0 +1,46 @@
+[package]
+name = "handy-rs"
+description = "A collection of utilities for my Rust projects"
+version = "1.0.0"
+authors = ["DarkCeptor44"]
+edition = "2021"
+rust-version = "1.78"
+license = "MIT"
+keywords = ["handy", "utilities", "pattern", "human", "parse"]
+categories = [
+    "development-tools",
+    "algorithms",
+    "data-structures",
+    "text-processing",
+]
+repository = "https://github.com/DarkCeptor44/handy-rs"
+homepage = "https://github.com/DarkCeptor44/handy-rs"
+
+[lib]
+name = "handy"
+
+[features]
+default = []
+full = ["collections", "human", "parse", "pattern"]
+
+collections = []
+human = ["dep:num-traits"]
+parse = []
+pattern = ["dep:levenshtein", "dep:regex"]
+
+[dependencies]
+levenshtein = { version = "^1", optional = true }
+num-traits = { version = "^0.2", optional = true }
+regex = { version = "^1", optional = true }
+
+[dev-dependencies]
+handy-rs = { version = "^1", features = ["full"], path = "." }
+criterion = "^0.5"
+rayon = "^1"
+rand = "^0.9"
+tempfile = "^3"
+temp-env = "^0.3"
+
+[[bench]]
+name = "bench_main"
+harness = false

@@ -1,0 +1,38 @@
+[package]
+name = "configura"
+description = "Configuration file logic for any Rust project"
+version = "1.0.0"
+authors = ["DarkCeptor44"]
+edition = "2021"
+rust-version = "1.78"
+license = "MIT"
+keywords = ["config", "settings", "load", "save", "configuration"]
+categories = ["development-tools", "configuration", "i-o"]
+repository = "https://github.com/DarkCeptor44/handy-rs"
+homepage = "https://github.com/DarkCeptor44/handy-rs"
+
+[features]
+default = ["json"]
+full = ["json", "toml", "yaml"]
+
+json = ["dep:serde_json"]
+toml = ["dep:toml"]
+yaml = ["dep:serde_yml"]
+
+[dependencies]
+serde = { version = "^1", features = ["derive"] }
+dirs = "^6"
+
+serde_json = { version = "^1", optional = true }
+serde_yml = { version = "^0.0.12", optional = true }
+toml = { version = "^0.8", optional = true }
+
+[dev-dependencies]
+configura = { version = "^1", features = ["full"], path = "." }
+tempfile = "^3"
+temp-env = "^0.3"
+criterion = "^0.5"
+
+[[bench]]
+name = "config_bench"
+harness = false
