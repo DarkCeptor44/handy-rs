@@ -43,3 +43,9 @@ temp-env = "^0.3"
 [[bench]]
 name = "bench_main"
 harness = false
+
+[package.metadata.docs.rs]
+all-features = true
+
+[package.metadata.playground]
+features = ["full"]

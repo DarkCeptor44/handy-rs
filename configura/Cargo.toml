@@ -35,3 +35,9 @@ criterion = "^0.5"
 [[bench]]
 name = "config_bench"
 harness = false
+
+[package.metadata.docs.rs]
+all-features = true
+
+[package.metadata.playground]
+features = ["full"]
