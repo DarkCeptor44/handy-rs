@@ -53,6 +53,8 @@ Run the benchmarks with `cargo bench`.
 | `Formatting/human_bytes_si_as_parts`| 56.630 ns 56.741 ns 56.894 ns              | 3 (3.00%) high mild, 10 (10.00%) high severe                  |
 | `Formatting/human_number`           | 207.89 ns 208.25 ns 208.71 ns              | 3 (3.00%) high mild, 2 (2.00%) high severe                   |
 | `Formatting/human_number_as_parts`  | 55.319 ns 55.478 ns 55.679 ns              | 5 (5.00%) high mild, 8 (8.00%) high severe                   |
+| `Formatting/Humanizer::format`      | 162.80 ns 163.22 ns 163.68 ns              | 3 (3.00%) high mild, 4 (4.00%) high severe                   |
+| `Formatting/Humanizer::format_as_parts` | 5.3102 ns 5.3168 ns 5.3254 ns          | 4 (4.00%) high mild, 8 (8.00%) high severe                   |
 | `Parse/split_at_non_digits`         | 63.391 ns 63.450 ns 63.520 ns              | 1 (1.00%) low severe, 1 (1.00%) low mild, 4 (4.00%) high mild, 5 (5.00%) high severe |
 
 ## License
