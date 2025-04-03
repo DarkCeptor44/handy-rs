@@ -17,10 +17,10 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-handy-rs = "^1"
+handy-rs = "^2"
 
 # to enable all features
-handy-rs = { version = "^1", features = ["full"] }
+handy-rs = { version = "^2", features = ["full"] }
 ```
 
 ## Usage
