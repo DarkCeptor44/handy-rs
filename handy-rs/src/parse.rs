@@ -13,7 +13,7 @@ use std::str::FromStr;
 ///
 /// ## Errors
 ///
-/// - [`ParseError::InvalidNumber`](crate::errors::ParseError::InvalidNumber): If the prefix cannot be parsed as a number
+/// - [`ParseError::InvalidNumber`]: If the prefix cannot be parsed as a number
 pub fn split_at_non_digits<N>(s: &str) -> Result<(N, String), ParseError>
 where
     N: FromStr,
