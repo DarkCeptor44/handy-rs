@@ -1,6 +1,33 @@
-#![allow(clippy::cast_precision_loss)]
-
 use num_traits::{AsPrimitive, Zero};
+use std::sync::OnceLock;
+
+static NUM_HUMANIZER: OnceLock<Humanizer> = OnceLock::new();
+static BINARY_HUMANIZER: OnceLock<Humanizer> = OnceLock::new();
+static SI_HUMANIZER: OnceLock<Humanizer> = OnceLock::new();
+
+fn num_humanizer() -> &'static Humanizer {
+    NUM_HUMANIZER.get_or_init(|| {
+        Humanizer::new(&["", "K", "M", "B", "T", "Qa", "Qd"])
+            .with_division_factor(1000.0)
+            .with_space_before_unit(true)
+    })
+}
+
+fn binary_humanizer() -> &'static Humanizer {
+    BINARY_HUMANIZER.get_or_init(|| {
+        Humanizer::new(&["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"])
+            .with_division_factor(1024.0)
+            .with_space_before_unit(true)
+    })
+}
+
+fn si_humanizer() -> &'static Humanizer {
+    SI_HUMANIZER.get_or_init(|| {
+        Humanizer::new(&["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"])
+            .with_division_factor(1000.0)
+            .with_space_before_unit(true)
+    })
+}
 
 /// A struct that can be used to humanize numbers with custom units.
 #[derive(Clone, Debug)]
@@ -113,9 +140,14 @@ impl Humanizer {
     {
         let (num_value, index) = self.calculate_parts(value);
         let unit = &self.units[index];
+        let space = if self.space_before_unit && !unit.is_empty() {
+            " "
+        } else {
+            ""
+        };
 
         if index == 0 && num_value == 0.0 {
-            return format!("0{unit}");
+            return format!("0{space}{unit}");
         }
 
         let abs_val = num_value.abs();
@@ -125,11 +157,6 @@ impl Humanizer {
             usize::from(abs_val < 100.0)
         };
 
-        let space = if self.space_before_unit && !unit.is_empty() {
-            " "
-        } else {
-            ""
-        };
         format!("{num_value:.precision$}{space}{unit}")
     }
 
@@ -175,26 +202,7 @@ pub fn human_bytes<U>(bytes: U) -> String
 where
     U: Zero + AsPrimitive<f64> + PartialEq,
 {
-    const UNITS: [&str; 7] = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"];
-
-    if bytes == U::zero() {
-        return "0 B".to_string();
-    }
-
-    let mut bytes = bytes.as_();
-    let mut index = 0;
-
-    while bytes >= 1024.0 && index < UNITS.len() - 1 {
-        bytes /= 1024.0;
-        index += 1;
-    }
-
-    let n = if bytes < 10.0 {
-        2
-    } else {
-        usize::from(bytes < 100.0)
-    };
-    format!("{bytes:.n$} {}", UNITS[index])
+    binary_humanizer().format(bytes)
 }
 
 /// Formats bytes into a human readable string and its unit.
@@ -204,28 +212,14 @@ where
 /// ```rust,no_run
 /// use handy::human::human_bytes_as_parts;
 ///
-/// assert_eq!(human_bytes_as_parts(123_456_789), (118.0, "MiB".to_string()));
+/// assert_eq!(human_bytes_as_parts(123_456_789), (118.0, "MiB"));
 /// ```
 #[must_use]
-pub fn human_bytes_as_parts<U>(bytes: U) -> (f64, String)
+pub fn human_bytes_as_parts<U>(bytes: U) -> (f64, &'static str)
 where
     U: Zero + AsPrimitive<f64> + PartialEq,
 {
-    const UNITS: [&str; 7] = ["B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"];
-
-    if bytes == U::zero() {
-        return (0.0, "B".to_string());
-    }
-
-    let mut bytes = bytes.as_();
-    let mut index = 0;
-
-    while bytes >= 1024.0 && index < UNITS.len() - 1 {
-        bytes /= 1024.0;
-        index += 1;
-    }
-
-    (bytes, UNITS[index].to_string())
+    binary_humanizer().format_as_parts(bytes)
 }
 
 /// Formats bytes into a human readable string using SI units.
@@ -242,26 +236,7 @@ pub fn human_bytes_si<U>(bytes: U) -> String
 where
     U: Zero + AsPrimitive<f64> + PartialEq,
 {
-    const UNITS: [&str; 7] = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
-
-    if bytes == U::zero() {
-        return "0 B".to_string();
-    }
-
-    let mut bytes = bytes.as_();
-    let mut index = 0;
-
-    while bytes >= 1000.0 && index < UNITS.len() - 1 {
-        bytes /= 1000.0;
-        index += 1;
-    }
-
-    let n = if bytes < 10.0 {
-        2
-    } else {
-        usize::from(bytes < 100.0)
-    };
-    format!("{bytes:.n$} {}", UNITS[index])
+    si_humanizer().format(bytes)
 }
 
 /// Formats bytes into a human readable string and its unit using SI units.
@@ -271,28 +246,14 @@ where
 /// ```rust,no_run
 /// use handy::human::human_bytes_si_as_parts;
 ///
-/// assert_eq!(human_bytes_si_as_parts(123_456_789), (118.0, "MB".to_string()));
+/// assert_eq!(human_bytes_si_as_parts(123_456_789), (118.0, "MB"));
 /// ```
 #[must_use]
-pub fn human_bytes_si_as_parts<U>(bytes: U) -> (f64, String)
+pub fn human_bytes_si_as_parts<U>(bytes: U) -> (f64, &'static str)
 where
     U: Zero + AsPrimitive<f64> + PartialEq,
 {
-    const UNITS: [&str; 7] = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
-
-    if bytes == U::zero() {
-        return (0.0, "B".to_string());
-    }
-
-    let mut bytes = bytes.as_();
-    let mut index = 0;
-
-    while bytes >= 1000.0 && index < UNITS.len() - 1 {
-        bytes /= 1000.0;
-        index += 1;
-    }
-
-    (bytes, UNITS[index].to_string())
+    si_humanizer().format_as_parts(bytes)
 }
 
 /// Formats a number into a human readable string.
@@ -309,26 +270,7 @@ pub fn human_number<U>(number: U) -> String
 where
     U: Zero + AsPrimitive<f64> + PartialEq,
 {
-    const UNITS: [&str; 7] = ["", "K", "M", "B", "T", "Qa", "Qi"];
-
-    if number == U::zero() {
-        return "0".to_string();
-    }
-
-    let mut number = number.as_();
-    let mut index = 0;
-
-    while number >= 1000.0 && index < UNITS.len() - 1 {
-        number /= 1000.0;
-        index += 1;
-    }
-
-    let n = if number < 10.0 {
-        2
-    } else {
-        usize::from(number < 100.0)
-    };
-    format!("{number:.n$} {}", UNITS[index]).trim().to_string()
+    num_humanizer().format(number)
 }
 
 /// Formats a number into a human readable string and its unit.
@@ -338,27 +280,13 @@ where
 /// ```rust,no_run
 /// use handy::human::human_number_as_parts;
 ///
-/// assert_eq!(human_number_as_parts(123_456_789), (123.0, "M".to_string()));
+/// assert_eq!(human_number_as_parts(123_456_789), (123.0, "M"));
 /// ```
-pub fn human_number_as_parts<U>(number: U) -> (f64, String)
+pub fn human_number_as_parts<U>(number: U) -> (f64, &'static str)
 where
     U: Zero + AsPrimitive<f64> + PartialEq,
 {
-    const UNITS: [&str; 7] = ["", "K", "M", "B", "T", "Qa", "Qi"];
-
-    if number == U::zero() {
-        return (0.0, String::new());
-    }
-
-    let mut number = number.as_();
-    let mut index = 0;
-
-    while number >= 1000.0 && index < UNITS.len() - 1 {
-        number /= 1000.0;
-        index += 1;
-    }
-
-    (number, UNITS[index].to_string())
+    num_humanizer().format_as_parts(number)
 }
 
 #[cfg(test)]
@@ -433,35 +361,32 @@ mod tests {
 
     #[test]
     fn test_human_bytes_as_parts() {
-        assert_eq!(human_bytes_as_parts(0), (0.0, "B".to_string()));
-        assert_eq!(human_bytes_as_parts(635), (635.0, "B".to_string()));
-        assert_eq!(
-            human_bytes_as_parts(12_345),
-            (12.055_664_062_5, "KiB".to_string())
-        );
+        assert_eq!(human_bytes_as_parts(0), (0.0, "B"));
+        assert_eq!(human_bytes_as_parts(635), (635.0, "B"));
+        assert_eq!(human_bytes_as_parts(12_345), (12.055_664_062_5, "KiB"));
         assert_eq!(
             human_bytes_as_parts(1_234_567),
-            (1.177_374_839_782_714_8, "MiB".to_string())
+            (1.177_374_839_782_714_8, "MiB")
         );
         assert_eq!(
             human_bytes_as_parts(123_456_789),
-            (117.737_568_855_285_64, "MiB".to_string())
+            (117.737_568_855_285_64, "MiB")
         );
         assert_eq!(
             human_bytes_as_parts(12_345_678_901u64),
-            (11.497_809_459_455_311, "GiB".to_string())
+            (11.497_809_459_455_311, "GiB")
         );
         assert_eq!(
             human_bytes_as_parts(123_456_789_012u64),
-            (114.978_094_596_415_76, "GiB".to_string())
+            (114.978_094_596_415_76, "GiB")
         );
         assert_eq!(
             human_bytes_as_parts(123_456_789_012_345u64),
-            (112.283_295_504_626_04, "TiB".to_string())
+            (112.283_295_504_626_04, "TiB")
         );
         assert_eq!(
             human_bytes_as_parts(123_456_789_012_345_678u64),
-            (109.651_655_766_236_97, "PiB".to_string())
+            (109.651_655_766_236_97, "PiB")
         );
     }
 
@@ -480,32 +405,26 @@ mod tests {
 
     #[test]
     fn test_human_bytes_si_as_parts() {
-        assert_eq!(human_bytes_si_as_parts(0), (0.0, "B".to_string()));
-        assert_eq!(human_bytes_si_as_parts(635), (635.0, "B".to_string()));
-        assert_eq!(human_bytes_si_as_parts(12_345), (12.345, "KB".to_string()));
-        assert_eq!(
-            human_bytes_si_as_parts(1_234_567),
-            (1.234_567, "MB".to_string())
-        );
-        assert_eq!(
-            human_bytes_si_as_parts(123_456_789),
-            (123.456_789, "MB".to_string())
-        );
+        assert_eq!(human_bytes_si_as_parts(0), (0.0, "B"));
+        assert_eq!(human_bytes_si_as_parts(635), (635.0, "B"));
+        assert_eq!(human_bytes_si_as_parts(12_345), (12.345, "KB"));
+        assert_eq!(human_bytes_si_as_parts(1_234_567), (1.234_567, "MB"));
+        assert_eq!(human_bytes_si_as_parts(123_456_789), (123.456_789, "MB"));
         assert_eq!(
             human_bytes_si_as_parts(12_345_678_901u64),
-            (12.345_678_901_000_001, "GB".to_string())
+            (12.345_678_901_000_001, "GB")
         );
         assert_eq!(
             human_bytes_si_as_parts(123_456_789_012u64),
-            (123.456_789_011_999_99, "GB".to_string())
+            (123.456_789_011_999_99, "GB")
         );
         assert_eq!(
             human_bytes_si_as_parts(123_456_789_012_345u64),
-            (123.456_789_012_345, "TB".to_string())
+            (123.456_789_012_345, "TB")
         );
         assert_eq!(
             human_bytes_si_as_parts(123_456_789_012_345_678u64),
-            (123.456_789_012_345_7, "PB".to_string())
+            (123.456_789_012_345_7, "PB")
         );
     }
 
@@ -524,32 +443,26 @@ mod tests {
 
     #[test]
     fn test_human_number_as_parts() {
-        assert_eq!(human_number_as_parts(0), (0.0, String::new()));
-        assert_eq!(human_number_as_parts(635), (635.0, String::new()));
-        assert_eq!(human_number_as_parts(12_345), (12.345, "K".to_string()));
-        assert_eq!(
-            human_number_as_parts(1_234_567),
-            (1.234_567, "M".to_string())
-        );
-        assert_eq!(
-            human_number_as_parts(123_456_789),
-            (123.456_789, "M".to_string())
-        );
+        assert_eq!(human_number_as_parts(0), (0.0, ""));
+        assert_eq!(human_number_as_parts(635), (635.0, ""));
+        assert_eq!(human_number_as_parts(12_345), (12.345, "K"));
+        assert_eq!(human_number_as_parts(1_234_567), (1.234_567, "M"));
+        assert_eq!(human_number_as_parts(123_456_789), (123.456_789, "M"));
         assert_eq!(
             human_number_as_parts(12_345_678_901u64),
-            (12.345_678_901_000_001, "B".to_string())
+            (12.345_678_901_000_001, "B")
         );
         assert_eq!(
             human_number_as_parts(123_456_789_012u64),
-            (123.456_789_011_999_99, "B".to_string())
+            (123.456_789_011_999_99, "B")
         );
         assert_eq!(
             human_number_as_parts(123_456_789_012_345u64),
-            (123.456_789_012_345, "T".to_string())
+            (123.456_789_012_345, "T")
         );
         assert_eq!(
             human_number_as_parts(123_456_789_012_345_678u64),
-            (123.456_789_012_345_7, "Qa".to_string())
+            (123.456_789_012_345_7, "Qa")
         );
     }
 }
