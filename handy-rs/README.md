@@ -8,6 +8,7 @@ Each feature enables a module with the same name containing the logic.
 
 * [`collections`](./src/collections.rs): Concurrent collections like `ConcurrentHashMap` and `ConcurrentBTreeMap`.
 * [`human`](./src/human.rs): Human readable formatting of numbers and bytes.
+* [`itertools`](./src/iter.rs): Iterable utility functions.
 * [`parse`](./src/parse.rs): Parsing of numbers and strings.
 * [`pattern`](./src/pattern.rs): Glob pattern matching.
 
@@ -55,6 +56,12 @@ Run the benchmarks with `cargo bench`.
 | `Formatting/human_number_as_parts`  | 6.7572 ns 6.7797 ns 6.8068 ns              | 3 (3.00%) low mild, 2 (2.00%) high mild, 9 (9.00%) high severe                   |
 | `Formatting/Humanizer::format`      | 162.80 ns 163.22 ns 163.68 ns              | 3 (3.00%) high mild, 4 (4.00%) high severe                   |
 | `Formatting/Humanizer::format_as_parts` | 5.3102 ns 5.3168 ns 5.3254 ns          | 4 (4.00%) high mild, 8 (8.00%) high severe                   |
+| `Itertools/IntoRefVec/Manual as_ref_vec` | 42.784 ns 42.961 ns 43.170 ns         | 10 (10.00%) high mild, 4 (4.00%) high severe             |
+| `Itertools/IntoRefVec/as_ref_vec`   | 45.564 ns 45.663 ns 45.776 ns              | 4 (4.00%) high mild, 7 (7.00%) high severe                   |
+| `Itertools/IntoRefVec/Manual as_mut_ref_vec` | 45.443 ns 45.719 ns 46.035 ns     | 3 (3.00%) high mild, 10 (10.00%) high severe                 |
+| `Itertools/IntoRefVec/as_mut_ref_vec` | 43.120 ns 43.203 ns 43.304 ns            | 7 (7.00%) high mild, 10 (10.00%) high severe                 |
+| `Itertools/StringIterable/Manual to_string_vec` | 678.06 ns 679.72 ns 681.80 ns  | 5 (5.00%) high mild, 3 (3.00%) high severe                   |
+| `Itertools/StringIterable/to_string_vec`   | 678.89 ns 680.08 ns 681.52 ns              | 5 (5.00%) high mild, 5 (5.00%) high severe          |
 | `Parse/split_at_non_digits`         | 63.391 ns 63.450 ns 63.520 ns              | 1 (1.00%) low severe, 1 (1.00%) low mild, 4 (4.00%) high mild, 5 (5.00%) high severe |
 
 ## License

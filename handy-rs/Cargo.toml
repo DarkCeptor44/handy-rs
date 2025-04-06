@@ -21,10 +21,11 @@ name = "handy"
 
 [features]
 default = []
-full = ["collections", "human", "parse", "pattern"]
+full = ["collections", "human", "itertools", "parse", "pattern"]
 
 collections = []
 human = ["dep:num-traits"]
+itertools = []
 parse = []
 pattern = ["dep:levenshtein", "dep:regex"]
 

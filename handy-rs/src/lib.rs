@@ -9,6 +9,9 @@ pub mod collections;
 #[cfg(feature = "human")]
 pub mod human;
 
+#[cfg(feature = "itertools")]
+pub mod iter;
+
 #[cfg(feature = "parse")]
 pub mod parse;
 
