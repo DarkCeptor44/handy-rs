@@ -2,6 +2,9 @@ use levenshtein::levenshtein;
 use regex::Regex;
 use std::path::Path;
 
+/// The margin of error for string similarity scores.
+pub const ERROR_MARGIN: f64 = 0.001;
+
 /// Converts a glob pattern to a regex pattern.
 ///
 /// ## Examples
@@ -32,6 +35,20 @@ pub fn glob_to_regex_pattern(pattern: &str) -> String {
         }
     }
     regex_pattern
+}
+
+/// Checks if a string similarity score is close to the upper bound (1.0), which (according to the [`ERROR_MARGIN`]) indicates a perfect match.
+///
+/// ## Arguments
+///
+/// * `score` - The similarity score to check, can be from [`match_string`].
+///
+/// ## Returns
+///
+/// * `bool` - True if the score is close to 1.0, false otherwise.
+#[must_use]
+pub fn is_close_to_upper_bound(score: f64) -> bool {
+    (score - 1.0).abs() < ERROR_MARGIN
 }
 
 /// Checks if a path's filename matches a glob pattern.
@@ -116,12 +133,13 @@ pub fn match_string(s1: &str, s2: &str) -> f64 {
     score.clamp(0.0, 1.0)
 }
 
+/// Asserts that two strings have a similarity score close to the expected value.
 #[macro_export]
 macro_rules! assert_match_string {
     ($s1:expr, $s2:expr, $expected:expr) => {
         let actual = $crate::pattern::match_string($s1, $s2);
         assert!(
-            (actual - $expected).abs() < 0.001,
+            (actual - $expected).abs() < $crate::pattern::ERROR_MARGIN,
             "Left: {}\nRight: {}",
             actual,
             $expected
@@ -132,7 +150,7 @@ macro_rules! assert_match_string {
 #[cfg(test)]
 mod tests {
     use super::{glob_to_regex_pattern, match_filename_with_glob_pattern};
-    use crate::assert_match_string;
+    use crate::{assert_match_string, pattern::is_close_to_upper_bound};
     use std::path::Path;
 
     #[test]
@@ -142,6 +160,18 @@ mod tests {
         assert_eq!(glob_to_regex_pattern("fish+txt"), "fish\\+txt");
         assert_eq!(glob_to_regex_pattern("fish\\txt"), "fish\\\\txt");
         assert_eq!(glob_to_regex_pattern("fish\\(txt"), "fish\\\\\\(txt");
+    }
+
+    #[test]
+    fn test_is_close_to_upper_bound() {
+        assert!(is_close_to_upper_bound(1.0));
+        assert!(is_close_to_upper_bound(0.9999));
+    }
+
+    #[test]
+    #[should_panic(expected = "is_close_to_upper_bound(0.999)")]
+    fn test_is_close_to_upper_bound_false() {
+        assert!(is_close_to_upper_bound(0.999));
     }
 
     #[test]
