@@ -2,34 +2,6 @@ use levenshtein::levenshtein;
 use regex::Regex;
 use std::path::Path;
 
-/// Checks if a path's filename matches a glob pattern.
-///
-/// ## Examples
-///
-/// ```rust,no_run
-/// use std::path::Path;
-/// use handy::pattern::match_filename_with_glob_pattern;
-///
-/// assert!(match_filename_with_glob_pattern(Path::new("fish.txt"), "f*.txt"));
-/// ```
-///
-/// ## Panics
-///
-/// This function panics if the internal glob pattern `.*` is invalid.
-#[must_use]
-pub fn match_filename_with_glob_pattern(path: &Path, pattern: &str) -> bool {
-    let regex_pattern = glob_to_regex_pattern(pattern);
-    let re = Regex::new(&regex_pattern).unwrap_or(Regex::new(".*").unwrap());
-
-    if let Some(name) = path.file_name().map(|s| s.to_string_lossy().to_string()) {
-        if re.is_match(&name) {
-            return true;
-        }
-    }
-
-    false
-}
-
 /// Converts a glob pattern to a regex pattern.
 ///
 /// ## Examples
@@ -60,6 +32,34 @@ pub fn glob_to_regex_pattern(pattern: &str) -> String {
         }
     }
     regex_pattern
+}
+
+/// Checks if a path's filename matches a glob pattern.
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// use std::path::Path;
+/// use handy::pattern::match_filename_with_glob_pattern;
+///
+/// assert!(match_filename_with_glob_pattern(Path::new("fish.txt"), "f*.txt"));
+/// ```
+///
+/// ## Panics
+///
+/// This function panics if the internal glob pattern `.*` is invalid.
+#[must_use]
+pub fn match_filename_with_glob_pattern(path: &Path, pattern: &str) -> bool {
+    let regex_pattern = glob_to_regex_pattern(pattern);
+    let re = Regex::new(&regex_pattern).unwrap_or(Regex::new(".*").unwrap());
+
+    if let Some(name) = path.file_name().map(|s| s.to_string_lossy().to_string()) {
+        if re.is_match(&name) {
+            return true;
+        }
+    }
+
+    false
 }
 
 /// Returns a similarity score between two strings using a fuzzy matching algorithm.
@@ -136,6 +136,15 @@ mod tests {
     use std::path::Path;
 
     #[test]
+    fn test_glob_to_regex() {
+        assert_eq!(glob_to_regex_pattern("fish*.txt"), "fish.*\\.txt");
+        assert_eq!(glob_to_regex_pattern("fish?txt"), "fish.txt");
+        assert_eq!(glob_to_regex_pattern("fish+txt"), "fish\\+txt");
+        assert_eq!(glob_to_regex_pattern("fish\\txt"), "fish\\\\txt");
+        assert_eq!(glob_to_regex_pattern("fish\\(txt"), "fish\\\\\\(txt");
+    }
+
+    #[test]
     fn test_match_filename_with_glob_pattern() {
         assert!(match_filename_with_glob_pattern(
             Path::new("fish.txt"),
@@ -145,15 +154,6 @@ mod tests {
             Path::new("fish.txt"),
             "f*.jpg"
         ));
-    }
-
-    #[test]
-    fn test_glob_to_regex() {
-        assert_eq!(glob_to_regex_pattern("fish*.txt"), "fish.*\\.txt");
-        assert_eq!(glob_to_regex_pattern("fish?txt"), "fish.txt");
-        assert_eq!(glob_to_regex_pattern("fish+txt"), "fish\\+txt");
-        assert_eq!(glob_to_regex_pattern("fish\\txt"), "fish\\\\txt");
-        assert_eq!(glob_to_regex_pattern("fish\\(txt"), "fish\\\\\\(txt");
     }
 
     #[test]
