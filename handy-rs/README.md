@@ -71,4 +71,4 @@ Run the benchmarks with `cargo bench`.
 
 ## License
 
-This crate is distributed under the terms of the [MIT license](LICENSE).
+This crate is distributed under the terms of the [MIT license](../LICENSE).
