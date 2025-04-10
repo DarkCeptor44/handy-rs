@@ -1,56 +1,15 @@
-use std::fmt::Display;
+use thiserror::Error;
 
-#[derive(Debug)]
+/// Errors that can occur when using the concurrent collections from the collections module.
+#[derive(Debug, Error, PartialEq, Eq)]
 pub enum ConcurrentCollectionError {
+    #[error("lock is poisoned")]
     Poison,
 }
 
-impl std::error::Error for ConcurrentCollectionError {}
-
-impl Display for ConcurrentCollectionError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ConcurrentCollectionError::Poison => write!(f, "Lock is poisoned"),
-        }
-    }
-}
-
-impl Eq for ConcurrentCollectionError {}
-
-impl PartialEq for ConcurrentCollectionError {
-    fn eq(&self, other: &Self) -> bool {
-        matches!(
-            (self, other),
-            (
-                ConcurrentCollectionError::Poison,
-                ConcurrentCollectionError::Poison
-            )
-        )
-    }
-}
-
-#[derive(Debug)]
+/// Errors that can occur when parsing numbers.
+#[derive(Debug, Error, PartialEq, Eq)]
 pub enum ParseError {
+    #[error("parse error: invalid number: {0}")]
     InvalidNumber(String),
-}
-
-impl std::error::Error for ParseError {}
-
-impl Display for ParseError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ParseError::InvalidNumber(s) => write!(f, "Parse error: Invalid number: {s}"),
-        }
-    }
-}
-
-impl Eq for ParseError {}
-
-impl PartialEq for ParseError {
-    fn eq(&self, other: &Self) -> bool {
-        matches!(
-            (self, other),
-            (ParseError::InvalidNumber(_), ParseError::InvalidNumber(_))
-        )
-    }
 }
