@@ -63,6 +63,11 @@ Run the benchmarks with `cargo bench`.
 | `Itertools/StringIterable/Manual to_string_vec` | 678.06 ns 679.72 ns 681.80 ns  | 5 (5.00%) high mild, 3 (3.00%) high severe                   |
 | `Itertools/StringIterable/to_string_vec`   | 678.89 ns 680.08 ns 681.52 ns              | 5 (5.00%) high mild, 5 (5.00%) high severe          |
 | `Parse/split_at_non_digits`         | 63.391 ns 63.450 ns 63.520 ns              | 1 (1.00%) low severe, 1 (1.00%) low mild, 4 (4.00%) high mild, 5 (5.00%) high severe |
+| `Pattern/glob_to_regex_pattern`     | 143.62 ns 143.80 ns 144.00 ns              | 3 (3.00%) high mild, 2 (2.00%) high severe                   |
+| `Pattern/Manual is_close_to_upper_bound` | 477.78 ps 480.43 ps 484.72 ps         | 2 (2.00%) high mild, 11 (11.00%) high severe                 |
+| `Pattern/is_close_to_upper_bound`   | 3.8181 ns 3.8197 ns 3.8215 ns              | 3 (3.00%) high mild, 1 (1.00%) high severe                   |
+| `Pattern/match_filename_with_glob_pattern` | 87.914 µs 88.055 µs 88.237 µs       | 2 (2.00%) high mild, 10 (10.00%) high severe                 |
+| `Pattern/match_string`              | 264.17 ns 265.63 ns 267.60 ns              | 3 (3.00%) high mild, 4 (4.00%) high severe                   |
 
 ## License
 
