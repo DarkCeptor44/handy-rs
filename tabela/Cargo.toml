@@ -1,0 +1,20 @@
+[package]
+name = "tabela"
+description = "Pretty tables for the terminal"
+version = "0.1.0"
+authors = ["DarkCeptor44"]
+edition = "2021"
+rust-version = "1.80"
+license = "MIT"
+keywords = ["cli", "table", "format", "print", "pretty"]
+categories = ["development-tools"]
+repository = "https://github.com/DarkCeptor44/handy-rs"
+homepage = "https://docs.rs/tabela"
+
+[dependencies]
+colored = "^3"
+thiserror = "^2"
+unicode-width = "^0.2"
+
+[dev-dependencies]
+handy-rs = { version = "^2", features = ["itertools"] }
