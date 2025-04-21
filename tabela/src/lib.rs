@@ -86,6 +86,7 @@
 
 #![forbid(unsafe_code)]
 #![warn(clippy::pedantic, missing_debug_implementations)]
+#![allow(clippy::doc_markdown)]
 
 mod errors;
 
