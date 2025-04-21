@@ -1,64 +1,31 @@
 use std::fmt::Display;
+use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, ConfigError>;
 
-#[derive(Debug)]
+#[derive(Debug, Error, PartialEq, Eq)]
 pub enum ConfigError {
-    Io(std::io::Error),
+    #[error("failed to read configuration file: {0}")]
+    Io(String),
+
+    #[error("previous write failed: {0}")]
     FailedWrite(String),
+
+    #[error("failed to serialize {0} data: {1}")]
     Serialization(String, String),
+
+    #[error("failed to deserialize {0} data: {1}")]
     Deserialization(String, String),
+
+    #[error("home directory not found")]
     NoHomeDir,
-}
-
-impl std::error::Error for ConfigError {}
-
-impl Display for ConfigError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ConfigError::Io(e) => write!(f, "failed to read configuration file: {e}"),
-            ConfigError::FailedWrite(e) => write!(f, "previous write failed: {e}"),
-            ConfigError::Serialization(format, e) => {
-                write!(f, "failed to serialize {} data: {e}", format.to_uppercase())
-            }
-            ConfigError::Deserialization(format, e) => write!(
-                f,
-                "failed to deserialize {} data: {e}",
-                format.to_uppercase()
-            ),
-            ConfigError::NoHomeDir => write!(f, "home directory not found"),
-        }
-    }
 }
 
 impl From<std::io::Error> for ConfigError {
     fn from(value: std::io::Error) -> Self {
-        ConfigError::Io(value)
+        ConfigError::Io(value.to_string())
     }
 }
-
-impl PartialEq for ConfigError {
-    fn eq(&self, other: &Self) -> bool {
-        matches!((self, other), |(
-            ConfigError::NoHomeDir,
-            ConfigError::NoHomeDir,
-        )| (
-            ConfigError::FailedWrite(_),
-            ConfigError::FailedWrite(_)
-        ) | (
-            ConfigError::Serialization(_, _),
-            ConfigError::Serialization(_, _)
-        ) | (
-            ConfigError::Deserialization(_, _),
-            ConfigError::Deserialization(_, _)
-        ) | (
-            ConfigError::Io(_),
-            ConfigError::Io(_)
-        ))
-    }
-}
-
-impl Eq for ConfigError {}
 
 impl ConfigError {
     pub fn serialization(format: &'static str, error: impl Display) -> Self {
