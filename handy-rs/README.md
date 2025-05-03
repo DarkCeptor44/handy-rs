@@ -11,6 +11,7 @@ Each feature enables a module with the same name containing the logic.
 * [`itertools`](./src/iter.rs): Iterable utility functions.
 * [`parse`](./src/parse.rs): Parsing of numbers and strings.
 * [`pattern`](./src/pattern.rs): Glob pattern matching.
+* [`tempdir`](./src/helpers/tempdir.rs): Temporary directory setup for testing and benchmarking.
 
 ## Installation
 
