@@ -6,8 +6,8 @@ pub mod errors;
 #[cfg(feature = "collections")]
 pub mod collections;
 
-/// Helper modules
-pub mod helper;
+#[cfg(feature = "fs")]
+pub mod fs;
 
 #[cfg(feature = "human")]
 pub mod human;
