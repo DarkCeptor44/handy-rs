@@ -6,6 +6,9 @@ pub mod errors;
 #[cfg(feature = "collections")]
 pub mod collections;
 
+#[cfg(feature = "fs")]
+pub mod fs;
+
 #[cfg(feature = "human")]
 pub mod human;
 
