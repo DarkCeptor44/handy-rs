@@ -21,29 +21,41 @@ name = "handy"
 
 [features]
 default = []
-full = ["collections", "human", "itertools", "parse", "pattern"]
+full = ["collections", "fs", "human", "itertools", "parse", "pattern"]
 
 collections = []
+fs = ["dep:anyhow", "dep:colored", "dep:rayon", "dep:tempfile"]
 human = ["dep:num-traits"]
 itertools = []
 parse = []
 pattern = ["dep:levenshtein", "dep:regex"]
 
 [dependencies]
+anyhow = { version = "^1", optional = true }
+colored = { version = "^2", optional = true }
 levenshtein = { version = "^1", optional = true }
 num-traits = { version = "^0.2", optional = true }
+rayon = { version = "^1", optional = true }
 regex = { version = "^1", optional = true }
+tempfile = { version = "^3", optional = true }
 thiserror = "^2"
 
 [dev-dependencies]
 criterion = "^0.5"
+divan = "^0.1"
 rayon = "^1"
 rand = "^0.9"
 tempfile = "^3"
 temp-env = "^0.3"
+walkdir = "^2"
+ignore = "^0.4"
 
 [[bench]]
 name = "bench_main"
+harness = false
+
+[[bench]]
+name = "bench_divan"
 harness = false
 
 [package.metadata.docs.rs]

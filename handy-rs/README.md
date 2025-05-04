@@ -7,6 +7,7 @@ A collection of often used logic in my Rust projects.
 Each feature enables a module with the same name containing the logic.
 
 * [`collections`](./src/collections.rs): Concurrent collections like `ConcurrentHashMap` and `ConcurrentBTreeMap`.
+* [`fs`](https://docs.rs/handy-rs/latest/handy/fs/index.html): Filesystem utility functions.
 * [`human`](./src/human.rs): Human readable formatting of numbers and bytes.
 * [`itertools`](./src/iter.rs): Iterable utility functions.
 * [`parse`](./src/parse.rs): Parsing of numbers and strings.
