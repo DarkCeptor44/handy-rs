@@ -53,6 +53,8 @@ use tempfile::{tempdir, TempDir};
 /// ## Examples
 ///
 /// ```rust,no_run
+/// use handy::fs::Walker;
+///
 /// // use walker as an iterator
 /// for entry in Walker::new("/path/to/dir").walk().unwrap() {
 ///     println!("{}", entry.unwrap().path().display());
@@ -60,6 +62,8 @@ use tempfile::{tempdir, TempDir};
 /// ```
 ///
 /// ```rust,no_run
+/// use handy::fs::Walker;
+///
 /// // use walker as a vector
 /// let entries = Walker::new("/path/to/dir").par_walk().unwrap();
 /// for entry in entries {
