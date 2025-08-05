@@ -1,3 +1,21 @@
+//! # Pattern
+//!
+//! This module contains functions for working with patterns like globbing and string similarity.
+//!
+//! ## Benchmarks
+//!
+//! ```text
+//! Timer precision: 100 ns
+//! bench_divan                             fastest       │ slowest       │ median        │ mean          │ samples │ iters
+//! ╰─ pattern                                            │               │               │               │         │
+//!    ├─ glob_to_regex_pattern             135.6 ns      │ 159.9 ns      │ 141.1 ns      │ 140.4 ns      │ 100     │ 12800
+//!    ├─ is_close_to_upper_bound           0.236 ns      │ 0.608 ns      │ 0.242 ns      │ 0.252 ns      │ 100     │ 1638400
+//!    ├─ is_close_to_upper_bound (Manual)  0.001 ns      │ 0.138 ns      │ 0.003 ns      │ 0.008 ns      │ 100     │ 3276800
+//!    ├─ match_filename_with_glob_pattern  168.5 µs      │ 717 µs        │ 186.5 µs      │ 202 µs        │ 100     │ 100
+//!    ├─ match_string                      243.5 ns      │ 291.9 ns      │ 251.3 ns      │ 250.4 ns      │ 100     │ 6400
+//!    ╰─ string_similarity                 184.1 ns      │ 348.1 ns      │ 193.5 ns      │ 203 ns        │ 100     │ 6400
+//! ```
+
 use jaro_winkler::jaro_winkler;
 use levenshtein::levenshtein;
 use regex::Regex;
