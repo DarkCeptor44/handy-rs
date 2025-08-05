@@ -151,7 +151,7 @@ impl Walker {
     }
 
     /// Print an error message
-    fn eprintln(&self, err: FsError) {
+    fn eprintln(&self, err: &FsError) {
         if self.print {
             if self.colored {
                 eprintln!("{}", err.to_string().red());
@@ -228,13 +228,13 @@ impl Walker {
             entries
                 .filter_map(|e| {
                     e.inspect_err(|_| {
-                        self.eprintln(FsError::DirEntry);
+                        self.eprintln(&FsError::DirEntry);
                     })
                     .ok()
                 })
                 .collect()
         } else {
-            self.eprintln(FsError::dir_read(path));
+            self.eprintln(&FsError::dir_read(path));
             return Ok(vec![]);
         };
 
@@ -243,7 +243,7 @@ impl Walker {
             .map(|e| {
                 let entry_path = e.path();
                 let Ok(file_type) = e.file_type() else {
-                    self.eprintln(FsError::FileType(entry_path));
+                    self.eprintln(&FsError::FileType(entry_path));
                     return Ok(vec![]);
                 };
 
@@ -254,7 +254,7 @@ impl Walker {
                     entries.extend(self.par_walk_inner(entry_path)?);
                     Ok(entries)
                 } else {
-                    self.eprintln(FsError::NonFileNonDir(entry_path));
+                    self.eprintln(&FsError::NonFileNonDir(entry_path));
                     Ok(vec![])
                 }
             })
