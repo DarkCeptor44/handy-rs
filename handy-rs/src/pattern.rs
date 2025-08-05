@@ -26,9 +26,9 @@ pub const ERROR_MARGIN: f64 = 0.001;
 
 /// Converts a glob pattern to a regex pattern.
 ///
-/// ## Examples
+/// ## Example
 ///
-/// ```rust,no_run
+/// ```rust
 /// use handy::pattern::glob_to_regex_pattern;
 ///
 /// assert_eq!(glob_to_regex_pattern("fish*.txt"), "fish.*\\.txt");
@@ -65,6 +65,14 @@ pub fn glob_to_regex_pattern(pattern: &str) -> String {
 /// ## Returns
 ///
 /// * `bool` - True if the score is close to 1.0, false otherwise.
+///
+/// ## Example
+///
+/// ```rust
+/// use handy::pattern::is_close_to_upper_bound;
+///
+/// assert!(is_close_to_upper_bound(0.9999));
+/// ```
 #[must_use]
 pub fn is_close_to_upper_bound(score: f64) -> bool {
     (score - 1.0).abs() < ERROR_MARGIN
@@ -72,18 +80,18 @@ pub fn is_close_to_upper_bound(score: f64) -> bool {
 
 /// Checks if a path's filename matches a glob pattern.
 ///
-/// ## Examples
+/// ## Panics
 ///
-/// ```rust,no_run
+/// This function panics if the internal glob pattern `.*` is invalid.
+///
+/// ## Example
+///
+/// ```rust
 /// use std::path::Path;
 /// use handy::pattern::match_filename_with_glob_pattern;
 ///
 /// assert!(match_filename_with_glob_pattern(Path::new("fish.txt"), "f*.txt"));
 /// ```
-///
-/// ## Panics
-///
-/// This function panics if the internal glob pattern `.*` is invalid.
 #[must_use]
 pub fn match_filename_with_glob_pattern(path: &Path, pattern: &str) -> bool {
     let regex_pattern = glob_to_regex_pattern(pattern);
@@ -100,9 +108,18 @@ pub fn match_filename_with_glob_pattern(path: &Path, pattern: &str) -> bool {
 
 /// Returns a similarity score between two strings using a fuzzy matching algorithm.
 ///
-/// ## Examples
+/// ## Arguments
 ///
-/// ```rust,no_run
+/// * `s1` - The first string.
+/// * `s2` - The second string.
+///
+/// ## Returns
+///
+/// The similarity score between the two strings.
+///
+/// ## Example
+///
+/// ```rust
 /// use handy::pattern::match_string;
 ///
 /// let s1 = "Salvage Yard";
@@ -146,18 +163,6 @@ pub fn match_string(s1: &str, s2: &str) -> f64 {
 
 /// Returns a similarity score between two strings using a fuzzy matching algorithm that relies on Jaro-Winkler instead Levenshtein. Use this over [`match_string`].
 ///
-/// ## Examples
-///
-/// ```rust,no_run
-/// use handy::pattern::string_similarity;
-///
-/// let s1 = "Salvage Yard";
-/// let s2 = "yad";
-///
-/// let score = string_similarity(s1, s2);
-/// println!("Score: {}", score);
-/// ```
-///
 /// ## Arguments
 ///
 /// * `s1` - The first string.
@@ -166,6 +171,18 @@ pub fn match_string(s1: &str, s2: &str) -> f64 {
 /// ## Returns
 ///
 /// The similarity score between the two strings, the score is a [f64] between 0.0 and 1.0.
+///
+/// ## Example
+///
+/// ```rust
+/// use handy::pattern::string_similarity;
+///
+/// let s1 = "Salvage Yard";
+/// let s2 = "yad";
+///
+/// let score = string_similarity(s1, s2);
+/// println!("Score: {}", score);
+/// ```
 #[must_use]
 pub fn string_similarity<S1, S2>(s1: S1, s2: S2) -> f64
 where
