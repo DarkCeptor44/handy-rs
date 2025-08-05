@@ -36,12 +36,13 @@ fs = ["dep:anyhow", "dep:colored", "dep:rayon", "dep:tempfile"]
 human = ["dep:num-traits"]
 itertools = []
 parse = []
-pattern = ["dep:levenshtein", "dep:regex"]
+pattern = ["dep:jaro_winkler", "dep:levenshtein", "dep:regex"]
 tempdir = ["dep:anyhow", "fs", "dep:rayon", "dep:tempfile"]
 
 [dependencies]
 anyhow = { version = "^1", optional = true }
 colored = { version = "^2", optional = true }
+jaro_winkler = { version = "^0.1", optional = true }
 levenshtein = { version = "^1", optional = true }
 num-traits = { version = "^0.2", optional = true }
 rayon = { version = "^1", optional = true }

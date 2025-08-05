@@ -1,3 +1,4 @@
+use jaro_winkler::jaro_winkler;
 use levenshtein::levenshtein;
 use regex::Regex;
 use std::path::Path;
@@ -133,11 +134,72 @@ pub fn match_string(s1: &str, s2: &str) -> f64 {
     score.clamp(0.0, 1.0)
 }
 
+/// Returns a similarity score between two strings using a fuzzy matching algorithm that relies on Jaro-Winkler instead Levenshtein. Use this over [`match_string`].
+///
+/// ## Examples
+///
+/// ```rust,no_run
+/// use handy::pattern::string_similarity;
+///
+/// let s1 = "Salvage Yard";
+/// let s2 = "yad";
+///
+/// let score = string_similarity(s1, s2);
+/// println!("Score: {}", score);
+/// ```
+///
+/// ## Arguments
+///
+/// * `s1` - The first string.
+/// * `s2` - The second string.
+///
+/// ## Returns
+///
+/// The similarity score between the two strings, the score is a [f64] between 0.0 and 1.0.
+#[must_use]
+pub fn string_similarity<S1, S2>(s1: S1, s2: S2) -> f64
+where
+    S1: AsRef<str>,
+    S2: AsRef<str>,
+{
+    string_similarity_impl(s1.as_ref(), s2.as_ref())
+}
+
+/// Returns a similarity score between two strings using a fuzzy matching algorithm that relies on Jaro-Winkler instead of Levenshtein.
+fn string_similarity_impl(s1: &str, s2: &str) -> f64 {
+    let s1 = s1.trim().to_lowercase();
+    let s2 = s2.trim().to_lowercase();
+
+    if s1.is_empty() || s2.is_empty() {
+        return 0.0;
+    }
+
+    if s1.contains(&s2) || s2.contains(&s1) {
+        return 1.0;
+    }
+
+    jaro_winkler(&s1, &s2)
+}
+
 /// Asserts that two strings have a similarity score close to the expected value.
 #[macro_export]
 macro_rules! assert_match_string {
     ($s1:expr, $s2:expr, $expected:expr) => {
         let actual = $crate::pattern::match_string($s1, $s2);
+        assert!(
+            (actual - $expected).abs() < $crate::pattern::ERROR_MARGIN,
+            "Left: {}\nRight: {}",
+            actual,
+            $expected
+        );
+    };
+}
+
+/// Asserts that two strings have a similarity score close to the expected value.
+#[macro_export]
+macro_rules! assert_string_similarity {
+    ($s1:expr, $s2:expr, $expected:expr) => {
+        let actual = $crate::pattern::string_similarity($s1, $s2);
         assert!(
             (actual - $expected).abs() < $crate::pattern::ERROR_MARGIN,
             "Left: {}\nRight: {}",
@@ -191,5 +253,13 @@ mod tests {
         assert_match_string!("kitten", "kissing", 0.333);
         assert_match_string!("Salvage Yard", "yard", 1.0);
         assert_match_string!("raiju", "yard", 0.0);
+    }
+
+    #[test]
+    fn test_string_similarity() {
+        assert_string_similarity!("kitten", "kissing", 0.714);
+        assert_string_similarity!("Salvage Yard", "yard", 1.0);
+        assert_string_similarity!("Salvage Yard", "yad", 0.472);
+        assert_string_similarity!("raiju", "yard", 0.483);
     }
 }
