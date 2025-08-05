@@ -9,6 +9,8 @@ pub mod collections;
 #[cfg(feature = "fs")]
 pub mod fs;
 
+pub mod helper;
+
 #[cfg(feature = "human")]
 pub mod human;
 

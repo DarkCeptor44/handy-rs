@@ -1,3 +1,9 @@
+//! # Helper module
+//!
+//! ## Sub-modules
+//!
+//! * [`tempdir`] - Helper for creating temporary directories with sub-directories and files
+
 #[cfg(feature = "tempdir")]
 pub mod tempdir;
 
