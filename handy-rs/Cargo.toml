@@ -21,7 +21,15 @@ name = "handy"
 
 [features]
 default = []
-full = ["collections", "fs", "human", "itertools", "parse", "pattern"]
+full = [
+    "collections",
+    "fs",
+    "human",
+    "itertools",
+    "parse",
+    "pattern",
+    "tempdir",
+]
 
 collections = []
 fs = ["dep:anyhow", "dep:colored", "dep:rayon", "dep:tempfile"]
@@ -29,6 +37,7 @@ human = ["dep:num-traits"]
 itertools = []
 parse = []
 pattern = ["dep:levenshtein", "dep:regex"]
+tempdir = ["dep:anyhow", "fs", "dep:rayon", "dep:tempfile"]
 
 [dependencies]
 anyhow = { version = "^1", optional = true }
