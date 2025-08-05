@@ -32,7 +32,7 @@ full = [
 ]
 
 collections = []
-fs = ["dep:anyhow", "dep:colored", "dep:rayon", "dep:tempfile"]
+fs = ["dep:anyhow", "dep:colored", "dep:rayon", "tempdir"]
 human = ["dep:num-traits"]
 itertools = []
 parse = []
