@@ -46,7 +46,6 @@ use std::{
     fs::{read_dir, DirEntry, ReadDir},
     path::{Path, PathBuf},
 };
-use tempfile::{tempdir, TempDir};
 
 /// A directory walker meant to be faster than alternatives like [`walkdir`](https://crates.io/crates/walkdir) and [`ignore`](https://crates.io/crates/ignore) but still close to [`std::fs::read_dir`], returning [`std::fs::DirEntry`] instead of a custom wrapper.
 ///
@@ -308,64 +307,30 @@ impl Iterator for Walker {
     }
 }
 
-// TODO replace with TempdirSetup
-struct Bench {
-    _temp_dir: TempDir,
-    temp_path: PathBuf,
-}
-
-impl Bench {
-    fn new() -> Self {
-        let dir = tempdir().expect("Failed to create temp dir");
-        let dir_path = dir.path().to_path_buf();
-
-        for i in 0..15 {
-            let file_path = dir_path.join(format!("file_{i}.txt"));
-            std::fs::write(file_path, b"hello").expect("Failed to write file");
-        }
-
-        for i in 0..10 {
-            let dir_path2 = dir_path.join(format!("dir_{i}"));
-            std::fs::create_dir(&dir_path2).expect("Failed to create dir");
-
-            for j in 0..5 {
-                let file_path = dir_path2.join(format!("file_{i}{j}.txt"));
-                std::fs::write(file_path, b"hello").expect("Failed to write file");
-            }
-        }
-
-        Bench {
-            _temp_dir: dir,
-            temp_path: dir_path,
-        }
-    }
-
-    fn path(&self) -> &Path {
-        &self.temp_path
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::helper::TempdirSetupBuilder;
 
     #[test]
     fn test_walker_iter() {
-        // TODO use TempdirSetup
-        let setup = Bench::new();
+        let setup = TempdirSetupBuilder::new()
+            .build()
+            .expect("Failed to build tempdir setup");
         let walker = Walker::new(setup.path())
             .walk()
             .expect("Failed to create walker");
-        assert_eq!(dbg!(walker).count(), 75);
+        assert_eq!(dbg!(walker).count(), setup.entries_count());
     }
 
     #[test]
     fn test_walker_parallel() {
-        // TODO use TempdirSetup
-        let setup = Bench::new();
+        let setup = TempdirSetupBuilder::new()
+            .build()
+            .expect("Failed to build tempdir setup");
         let entries = Walker::new(setup.path())
             .par_walk()
             .expect("Failed to create walker");
-        assert_eq!(dbg!(entries).len(), 75);
+        assert_eq!(dbg!(entries).len(), setup.entries_count());
     }
 }
