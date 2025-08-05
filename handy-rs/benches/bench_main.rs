@@ -7,5 +7,4 @@ criterion_main!(
     benchmarks::human::human,
     benchmarks::iter::iter,
     benchmarks::parse::parse,
-    benchmarks::pattern::pattern
 );
