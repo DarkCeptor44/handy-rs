@@ -111,16 +111,8 @@ pub fn match_filename_with_glob_pattern(path: &Path, pattern: &str) -> bool {
 /// let score = match_string(s1, s2);
 /// println!("Score: {}", score);
 /// ```
-///
-/// ## Arguments
-///
-/// * `s1` - The first string.
-/// * `s2` - The second string.
-///
-/// ## Returns
-///
-/// The similarity score between the two strings.
 #[allow(clippy::cast_precision_loss)]
+#[deprecated(since = "2.2.0", note = "Use `string_similarity` instead")]
 #[must_use]
 pub fn match_string(s1: &str, s2: &str) -> f64 {
     let s1 = s1.to_lowercase();
@@ -201,6 +193,7 @@ fn string_similarity_impl(s1: &str, s2: &str) -> f64 {
 
 /// Asserts that two strings have a similarity score close to the expected value.
 #[macro_export]
+#[deprecated(since = "2.2.0", note = "Use `assert_string_similarity` instead")]
 macro_rules! assert_match_string {
     ($s1:expr, $s2:expr, $expected:expr) => {
         let actual = $crate::pattern::match_string($s1, $s2);
